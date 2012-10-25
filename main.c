@@ -13,15 +13,17 @@
 
 int main( int argc, char **argv){
     int scelta=0;
+    list l=NULL;
     
     menu_start();
     menu( &scelta );
-
+    
     while( scelta != 6 ){
         switch ( scelta ) {
             case 1:
-                printf("Scelta 1\n");
-				/* Something to do */
+                printf("Creazione dizonaro per file %s\n", argv[1]);
+				l = scroll_txt_file(argv[1], l);                
+                show_list( l );
 				menu( &scelta);
                 break;
             case 2:

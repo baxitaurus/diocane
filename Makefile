@@ -7,12 +7,12 @@ PROGRAM=$(BIN_DIR)
 $(shell [ -d "$(PROGRAM)" ] || mkdir -p $(PROGRAM))
 
 CC=gcc
-CFLAGS=-Wall -W -g 
+CFLAGS=-Wall -g 
 
 .PHONY: all clean rebuild
 
 all:$(OBJS) 
-	$(CC) $(CFLAGS) main.c menu.c -o $(PROGRAM)/xxx
+	$(CC) $(CFLAGS) main.c menu.c readfile.c -o $(PROGRAM)/xxx
 
 rebuild: clean all
 
