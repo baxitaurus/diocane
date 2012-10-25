@@ -10,15 +10,18 @@ list scroll_txt_file(char *file, list l){
         printf("ERRORE: apertura file: %s\n", file);
         exit(1);
     }
-    while((fread(&x, 1, 1, fp)) > 0){     
-        if( x > 0x7E ){
+    while((fread(&x, 1, 1, fp)) > 0){ 
+        if( x > 0x19 && x <= 0x7E )
+            l = cons(l, x);
+        else if( x > 0x7E ){
             fread(&y, 1, 1, fp);                 
             x<<=8;
             x+=y;            
             y=0;
+            if( x >= 0xC2A0 && x <= 0xC3bF)
+                l = cons(l, x);
         }
-    l = cons(l, x);
-    x=0;
+        x = 0x0000;
     }
     fclose(fp);
     lista_ordinata = ordina_lista(l);    
