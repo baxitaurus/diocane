@@ -3,5 +3,5 @@
 *~
 *.swp
 tmp/**/*
-bin/
-nbproject/
+bin/*
+nbproject/*
