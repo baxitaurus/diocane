@@ -30,3 +30,4 @@ list delete( info_carattere c, list l);
 list cons_el( info_carattere m,  list lista_ordinata);
 info_carattere cerca_maggiore(list l);
 list insOrd( list l, info_carattere e);
+int length_list(list l); // aggiunta da baxitaurus

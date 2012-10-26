@@ -1,4 +1,4 @@
-#include "list.h"
+#include "el.h"
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -17,3 +17,5 @@ el_type root(tree t);
 tree left(tree t);
 tree right(tree t);
 tree cons_tree(el_type el,tree l,tree r); // !E' IN PROVA OCCHIO!
+tree new_constree(int sum,tree l,tree r);
+void inorder(tree t);

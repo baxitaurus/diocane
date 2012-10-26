@@ -98,3 +98,11 @@ void show_list(list l){
     }        
 }
 
+int length_list(list l){
+	int dim=0;
+	while(l!=NULL){
+		l=l->next;
+		dim++;
+	}
+	return dim;
+}
