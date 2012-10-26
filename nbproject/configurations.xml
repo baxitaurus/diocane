@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configurationDescriptor version="84">
+  <logicalFolder name="root" displayName="root" projectFiles="true" kind="ROOT">
+    <df name="diocane" root=".">
+      <df name="bin">
+      </df>
+      <in>el.c</in>
+      <in>el.h</in>
+      <in>list.c</in>
+      <in>list.h</in>
+      <in>main.c</in>
+      <in>menu.c</in>
+      <in>menu.h</in>
+      <in>readfile.c</in>
+      <in>readfile.h</in>
+      <in>tree.c</in>
+      <in>tree.h</in>
+    </df>
+    <logicalFolder name="ExternalFiles"
+                   displayName="Important Files"
+                   projectFiles="false"
+                   kind="IMPORTANT_FILES_FOLDER">
+      <itemPath>Makefile</itemPath>
+    </logicalFolder>
+  </logicalFolder>
+  <sourceFolderFilter>^(nbproject)$</sourceFolderFilter>
+  <sourceRootList>
+    <Elem>.</Elem>
+  </sourceRootList>
+  <projectmakefile>Makefile</projectmakefile>
+  <confs>
+    <conf name="Default" type="0">
+      <toolsSet>
+        <remote-sources-mode>LOCAL_SOURCES</remote-sources-mode>
+        <compilerSet>default</compilerSet>
+      </toolsSet>
+      <codeAssistance>
+      </codeAssistance>
+      <makefileType>
+        <makeTool>
+          <buildCommandWorkingDir>.</buildCommandWorkingDir>
+          <buildCommand>${MAKE} -f Makefile</buildCommand>
+          <cleanCommand>${MAKE} -f Makefile clean</cleanCommand>
+          <executablePath></executablePath>
+        </makeTool>
+      </makefileType>
+      <item path="el.c" ex="true" tool="0" flavor2="0">
+      </item>
+      <item path="el.h" ex="true" tool="3" flavor2="0">
+      </item>
+      <item path="list.c" ex="true" tool="0" flavor2="0">
+      </item>
+      <item path="list.h" ex="true" tool="3" flavor2="0">
+      </item>
+      <item path="tree.c" ex="true" tool="0" flavor2="0">
+      </item>
+      <item path="tree.h" ex="true" tool="3" flavor2="0">
+      </item>
+    </conf>
+  </confs>
+</configurationDescriptor>
