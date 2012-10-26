@@ -4,28 +4,26 @@ list scroll_txt_file(char *file, list l){
     FILE *fp;
     unsigned int x=0;
     unsigned char y=0;
-    int overflow=0;
     list lista_ordinata=NULL;
 
     if((fp=fopen(file, "rb"))==NULL){
         printf("ERRORE: apertura file: %s\n", file);
         exit(1);
     }
-    while((fread(&x, 1, 1, fp)) > 0 && !overflow){ 
+    while((fread(&x, 1, 1, fp)) > 0){ 
         if( x > 0x19 && x <= 0x7E )
-            l = cons(l, x, &overflow);
+            l = cons(l, x);
         else if( x > 0x7E ){
             fread(&y, 1, 1, fp);                 
             x<<=8;
             x+=y;            
-            y=0x0000;
+            y=0;
             if( x >= 0xC2A0 && x <= 0xC3bF)
-                l = cons(l, x, &overflow);
+                l = cons(l, x);
         }
         x = 0x0000;
     }
     fclose(fp);
-    printf("over: %d\n", overflow);
     lista_ordinata = ordina_lista(l);    
     return lista_ordinata;
 }
@@ -56,9 +54,9 @@ list cons_el( info_carattere m,  list lista_ordinata){
     return aux;
 }
 
-list cons (list l, unsigned int x, int *overflow) {    
+list cons (list l,unsigned int x) {
     if(member(l,x)){
-        add_presenza(l, x, &overflow);
+        add_presenza(l,x);
         return l;
     } else {
         list aux;
@@ -70,15 +68,12 @@ list cons (list l, unsigned int x, int *overflow) {
     }
 }
 
-int add_presenza( list l, unsigned int x, int **overflow){
-    int trovato = 0;    
-    unsigned int tester = 0x0000-2;
+int add_presenza( list l, unsigned int x){
+    int trovato = 0;
     while((l!=NULL) && !trovato){
-        if(l->value.carattere == x){            
-            l->value.presenze++;            
-            trovato = 1;            
-            if(l->value.presenze == tester)
-                **overflow = 1;
+        if(l->value.carattere == x){
+            l->value.presenze++;
+            trovato = 1;
         } else
             l = l->next;
     }
