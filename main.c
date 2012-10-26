@@ -10,10 +10,10 @@
 #include "readfile.h"
 #endif
 
-
 int main( int argc, char **argv){
     int scelta=0;
     list l=NULL;
+
     
     menu_start();
     menu( &scelta );

@@ -19,9 +19,9 @@ typedef struct item {
 typedef nodo* list;
 
 list scroll_txt_file(char *file, list l);
-list cons( list l, unsigned int x);
+list cons (list l,unsigned int x, int *overflow);
 int member( list l, unsigned int x);
-int add_presenza( list l, unsigned int x);
+int add_presenza( list l, unsigned int x, int **overflow );
 void show_list(list l);
 list ordina_lista( list l);
 list tail( list l );
