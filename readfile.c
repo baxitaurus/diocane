@@ -5,21 +5,21 @@ list scroll_txt_file(char *file, list l){
     unsigned int x=0;
     unsigned char y=0;
     list lista_ordinata=NULL;
-
+    int overflow=0;
     if((fp=fopen(file, "rb"))==NULL){
         printf("ERRORE: apertura file: %s\n", file);
         exit(1);
     }
     while((fread(&x, 1, 1, fp)) > 0){ 
         if( x > 0x19 && x <= 0x7E )
-            l = cons(l, x);
+            l = cons(l, x, &overflow);
         else if( x > 0x7E ){
             fread(&y, 1, 1, fp);                 
             x<<=8;
             x+=y;            
             y=0;
             if( x >= 0xC2A0 && x <= 0xC3bF)
-                l = cons(l, x);
+                l = cons(l, x, &overflow);
         }
         x = 0x0000;
     }
@@ -38,11 +38,11 @@ list ordina_lista( list l){
 }
 
 list insOrd( list l, info_carattere e){
-	if(l==NULL)
-		return cons_el( e, l );
-	else if(e.presenze < l->value.presenze )
-		return cons_el ( e, l );
-	else 
+    if(l==NULL)
+        return cons_el( e, l );
+    else if(e.presenze < l->value.presenze )
+        return cons_el ( e, l );
+    else 
         return cons_el( l->value, insOrd( l->next, e ) );
 }
 
@@ -54,9 +54,9 @@ list cons_el( info_carattere m,  list lista_ordinata){
     return aux;
 }
 
-list cons (list l,unsigned int x) {
+list cons (list l,unsigned int x, int *overflow) {
     if(member(l,x)){
-        add_presenza(l,x);
+        add_presenza(l,x, &overflow);
         return l;
     } else {
         list aux;
@@ -68,12 +68,15 @@ list cons (list l,unsigned int x) {
     }
 }
 
-int add_presenza( list l, unsigned int x){
+int add_presenza( list l, unsigned int x, int **overflow){
     int trovato = 0;
+    unsigned int tester = 0x0000-2;
     while((l!=NULL) && !trovato){
         if(l->value.carattere == x){
             l->value.presenze++;
             trovato = 1;
+            if(l->value.presenze == tester)
+                **overflow = 1;
         } else
             l = l->next;
     }
@@ -99,10 +102,10 @@ void show_list(list l){
 }
 
 int length_list(list l){
-	int dim=0;
-	while(l!=NULL){
-		l=l->next;
-		dim++;
-	}
-	return dim;
+    int dim=0;
+    while(l!=NULL){
+        l=l->next;
+        dim++;
+    }
+    return dim;
 }

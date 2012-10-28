@@ -1,5 +1,6 @@
+#ifndef MENU_H
 #include "menu.h"
-
+#endif
 void menu_start(){
     printf("Programma di compressione e decompressione testo\n");
     printf("UniFe Andrea bassi & Luigi Scagnet\n\n");

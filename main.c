@@ -10,15 +10,20 @@
 #include "readfile.h"
 #endif
 
+#ifndef LZW_H
+#include "lzw.h"
+#endif
+
 int main( int argc, char **argv){
     int scelta=0;
     list l=NULL;
-
     
-    menu_start();
-    menu( &scelta );
+    lzw_compression();
     
-    while( scelta != 6 ){
+    //menu_start();
+    //menu( &scelta );
+    
+    while( 0 ){ // scelta != 6 ){
         switch ( scelta ) {
             case 1:
                 printf("Creazione dizonaro per file %s\n", argv[1]);

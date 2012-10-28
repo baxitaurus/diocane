@@ -12,7 +12,7 @@ CFLAGS=-Wall -g
 .PHONY: all clean rebuild
 
 all:$(OBJS) 
-	$(CC) $(CFLAGS) main.c menu.c readfile.c -o $(PROGRAM)/xxx
+	$(CC) $(CFLAGS) main.c menu.c readfile.c lzw.c -o $(PROGRAM)/xxx
 
 rebuild: clean all
 
