@@ -18,7 +18,7 @@ int main( int argc, char **argv){
     int scelta=0;
     list l=NULL;
     lzw_compression();
-    lzw_decompression();
+    //lzw_decompression();
     
     //menu_start();
     //menu( &scelta );

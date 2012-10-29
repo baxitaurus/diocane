@@ -7,24 +7,31 @@
 #endif
 #define TABLE_SIZE 15
 
+//ridefinizione tipi per conoscere misura in bit
+typedef unsigned int uint32;
+typedef unsigned short int uint16;
+typedef unsigned char uint8;
+
+
+
 typedef struct item_diz {
-    unsigned int char_code[TABLE_SIZE];
-    unsigned short int new_code;
+    uint16 char_code[TABLE_SIZE];
+    uint16 new_code;
     struct item_diz* next;
 } nodo_diz;
 
 typedef nodo_diz* diz_lzw;
 
-diz_lzw init();
+diz_lzw initUTF8();
 diz_lzw initAscii();
-diz_lzw cons_tail(diz_lzw l, unsigned int *e);
+diz_lzw cons_tail(diz_lzw l, uint16 *e);
 void lzw_compression();
-int trova ( diz_lzw l, unsigned int *str);
-int confronta(unsigned int *a, unsigned int *b);
-void reset_array( unsigned int *array);
-void copia_array(unsigned int *a, unsigned int *b);
+int trova ( diz_lzw l, uint16 *str);
+int confronta(uint16 *a, uint16 *b);
+void reset_array( uint16 *array);
+void copia_array(uint16 *a, uint16 *b);
 void lzw_decompression();
-int find_code( diz_lzw l, unsigned int code, unsigned int strCorr[] );
-void stampa( unsigned int *str );
-void concatena(unsigned int *a, unsigned int *b, unsigned int *risultato);
-void write_file( unsigned int *str, FILE *fo );
+int find_code( diz_lzw l, uint16 code, uint16 strCorr[] );
+void stampa( uint16 *str );
+void concatena(uint16 *a, uint16 *b, uint16 *risultato);
+void write_file( uint16 *str, FILE *fo );

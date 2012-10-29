@@ -2,13 +2,13 @@
 #include "lzw.h"
 #endif
 
-unsigned int diz_long;
-unsigned int output_long;
-diz_lzw init(){
+uint16 diz_long;
+uint16 output_long;
+diz_lzw initUTF8(){
     //creo lista con i valori base dell'alfabeto a-z A-Z 0-1 simboli e accenti vari
     int i;
-    unsigned int karray[TABLE_SIZE];
-    unsigned int k;
+    uint16 karray[TABLE_SIZE];
+    uint16 k;
     
     diz_lzw dizionario = NULL;
     diz_long =0;
@@ -37,7 +37,7 @@ diz_lzw init(){
 
 diz_lzw initAscii(){
     diz_lzw dizionario = NULL;
-    unsigned int karray[TABLE_SIZE];
+    uint16 karray[TABLE_SIZE];
     int i;
     diz_long =0;
     output_long=0;
@@ -52,18 +52,19 @@ diz_lzw initAscii(){
 
 
 void lzw_compression(){
-    unsigned int strCorr[TABLE_SIZE];
-    unsigned int strPrs[TABLE_SIZE];
-    unsigned int lstChr;
+    uint16 strCorr[TABLE_SIZE];
+    uint16 strPrs[TABLE_SIZE];
+    uint16 lstChr;
+    uint16 carattere_speciale = 0;
+    uint8 carattere_letto=0;
+    uint16 write;
+    
     FILE *fp, *fo;
-    unsigned int carattere_letto=0;
-    unsigned char y=0;
     diz_lzw dizionario = NULL;
     int buffer_pointer = 0;
     int i;
-    unsigned int write;
     
-    dizionario = initAscii();
+    dizionario = initUTF8();
     
     if((fp=fopen("testo_prova.txt", "rb"))==NULL){
         printf("ERRORE: apertura file: %s\n", "Bibbia");
@@ -77,29 +78,32 @@ void lzw_compression(){
     
     reset_array( strCorr );
     
-    while((fread(&carattere_letto, 1, 1, fp)) > 0){                
+    while((fread( &carattere_letto, sizeof( uint8 ), 1, fp)) > 0){                
+        //printf("%x\n", carattere_letto);
+        
         if( carattere_letto <= 0x7F ){
-            //carattere ascii
-            strCorr[buffer_pointer] = carattere_letto;
-        } else if( carattere_letto > 0x7E ){
-            fread(&y, 1, 1, fp);                 
-            carattere_letto<<=8;
-            carattere_letto+=y;            
-            y=0;
-            strCorr[buffer_pointer] = carattere_letto;
-         
+            strCorr[buffer_pointer] = carattere_letto;            
+            carattere_letto = 0;   
+        } else {
+            carattere_speciale = carattere_letto;
+            fread(&carattere_letto, sizeof( uint8 ), 1, fp);
+            //printf("%x\n", carattere_letto);
+            carattere_speciale <<= 8;
+            carattere_speciale += carattere_letto;            
+            strCorr[buffer_pointer] = carattere_speciale;
+            carattere_speciale = 0;      
         }
+        
         if (trova( dizionario, strCorr )){
-            //trovata stringa in dizionario
-            buffer_pointer++;          
+            buffer_pointer++;
         } else {
             lstChr = strCorr[buffer_pointer];
             reset_array( strPrs );
             for( i = 0; i < buffer_pointer; i++ )
                 strPrs[i] = strCorr[i];  
             write = trova ( dizionario, strPrs);
-            //printf("%x\n", write);//output file
-            fwrite( &write, sizeof(unsigned short int), 1, fo);
+            printf("%d\n", write);
+            fwrite( &write, sizeof( uint16 ), 1, fo);
             output_long++;
             cons_tail(dizionario, strCorr);
             reset_array( strCorr );
@@ -109,8 +113,8 @@ void lzw_compression(){
         }
     }  
     write = trova( dizionario, strCorr);
-    //printf("%x\n", write);//output file    
-    fwrite( &write, sizeof(unsigned short int), 1, fo);
+    printf("%d\n", write);//output file    
+    fwrite( &write, 2, 1, fo);
     printf("NUMERO DI DATI IN DIZIONARIO: %d\n", diz_long);
     printf("NUMERO DI DATI IN OUTPUT: %d\n", output_long);
     fclose( fp );
@@ -120,13 +124,15 @@ void lzw_compression(){
 
 void lzw_decompression(){
     FILE *fi, *fo;
-    unsigned int dec, olDec;
-    unsigned int strLst[TABLE_SIZE];
-    unsigned int strTmp[TABLE_SIZE];
-    unsigned int strConc[TABLE_SIZE];
+    uint16 dec, olDec;
+    uint16 strLst[TABLE_SIZE];
+    uint16 strTmp[TABLE_SIZE];
+    uint16 strConc[TABLE_SIZE];
     diz_lzw dizionario = NULL;
     
-    dizionario = initAscii();
+    
+    dizionario = initUTF8();
+    
     if((fi=fopen("testo_prova.lzw", "rb"))==NULL){
         printf("ERRORE: apertura file: %s\n", "x");
         exit(1);
@@ -168,14 +174,14 @@ void lzw_decompression(){
     fclose( fo );    
 }
 
-void write_file( unsigned int *str, FILE *fo ){
+void write_file(uint16 *str, FILE *fo ){
     int i=0;
     while( str[i] != 0 && i < TABLE_SIZE ){
-        if(str[i] > 0x7e ){
-            printf(" - Scrive ui: %x, %d, %d\n", str[i], sizeof(str[i]),sizeof(unsigned int) );
-            //fwrite( &str[i], sizeof(unsigned int),2, fo);
+        if(str[i] > 0x7f ){
+            //printf(" - Scrive ui: %x, %d, %d\n", str[i], sizeof(str[i]),sizeof(unsigned int) );
+            fwrite( &str[i], sizeof( char ),2, fo);
         }else{
-            printf(" - Scrive ch: %x, %d, %d\n", str[i], sizeof(str[i]),sizeof(char) );
+            //printf(" - Scrive ch: %x, %d, %d\n", str[i], sizeof(str[i]),sizeof(char) );
             fwrite( &str[i], sizeof( char), 1, fo);
         }
         i++;
@@ -183,7 +189,7 @@ void write_file( unsigned int *str, FILE *fo ){
 }
 
 
-void stampa( unsigned int *str ){
+void stampa(uint16 *str ){
     int i=0;
     while( str[i] != 0 && i < TABLE_SIZE ){
         printf("%c", str[i]);
@@ -191,7 +197,7 @@ void stampa( unsigned int *str ){
     }
 }
 
-int find_code( diz_lzw l, unsigned int code, unsigned int strCorr[] ){
+int find_code( diz_lzw l,uint16 code,uint16 strCorr[] ){
     int trovato = 0;
     while((l!=NULL) && !trovato){
         if( l->new_code == code ){        
@@ -204,7 +210,7 @@ int find_code( diz_lzw l, unsigned int code, unsigned int strCorr[] ){
 }
 
 
-diz_lzw cons_tail(diz_lzw l, unsigned int *e){
+diz_lzw cons_tail(diz_lzw l,uint16 *e){
     diz_lzw aux=l;
     if(l==NULL){
         aux=(diz_lzw)malloc(sizeof(nodo_diz));
@@ -222,7 +228,7 @@ diz_lzw cons_tail(diz_lzw l, unsigned int *e){
     return l;
 }
 
-int trova ( diz_lzw l, unsigned int *str){
+int trova ( diz_lzw l,uint16 *str){
     int trovato = 0;
     while((l!=NULL) && !trovato){
         if( confronta( l->char_code, str)){        
@@ -234,7 +240,7 @@ int trova ( diz_lzw l, unsigned int *str){
     return trovato;   
 }
 
-int confronta(unsigned int *a, unsigned int *b){
+int confronta(uint16 *a,uint16 *b){
     int i=0;
     while(a[i] == b[i] && i<TABLE_SIZE)
         i++;
@@ -244,20 +250,20 @@ int confronta(unsigned int *a, unsigned int *b){
         return 0;
 }
 
-void reset_array( unsigned int *array){
+void reset_array( uint16 *array){
     int i;
     for( i = 0; i < TABLE_SIZE; i++ )
         array[i] = 0x0000;
 }
 
-void copia_array(unsigned int *a, unsigned int *b){
+void copia_array(uint16 *a,uint16 *b){
     int i;
     for( i = 0; i < TABLE_SIZE; i++ )
         a[i] = b[i];
     
 }
 
-void concatena(unsigned int *a, unsigned int *b, unsigned int *risultato){
+void concatena(uint16 *a,uint16 *b,uint16 *risultato){
     int i=0;
     for( i = 0; i < TABLE_SIZE; i++ ){
         risultato[i]=a[i];
