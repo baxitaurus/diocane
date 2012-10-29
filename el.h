@@ -17,3 +17,4 @@ void show_el(el_type e); // stampa a video di un elemento di tipo el_type
 boolean isless(el_type e1,el_type e2); // controlla se l'elemento e1 ha una frequenza inferiore a quella di e2
 boolean isequal(el_type e1,el_type e2); // controlla se la frequenza dei due elementi è la stessa
 el_type converti(info_carattere el);
+void show_bit(el_type e);
