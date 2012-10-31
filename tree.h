@@ -19,3 +19,4 @@ tree right(tree t);
 tree cons_tree(el_type el,tree l,tree r); // !E' IN PROVA OCCHIO!
 tree new_constree(int sum,tree l,tree r);
 void inorder(tree t);
+boolean member_tree(unsigned int el,tree t);

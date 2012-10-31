@@ -50,10 +50,20 @@ tree new_constree(int sum,tree l,tree r){
 }
 
 void inorder(tree t){
-	if(t!=NULL){
+	if(!emptyt(t)){
 		inorder(t->left);
-		if(t->left==NULL && t->right==NULL) // stampa solo se e' una foglia dato che non ci sono simboli nei nodi intermedi (proprietà di prefisso)
-			new_showel(t);
+			if(t->left==NULL && t->right==NULL)
+				show_el(t->value);
 		inorder(t->right);
+	}
+}
+
+boolean member_tree(unsigned int el,tree t){
+	if(emptyt(t))
+		return 0;
+	else{
+		if(t->value.carattere==el)
+			return 1;
+		return (member_tree(el,t->left) || member_tree(el,t->right));
 	}
 }
