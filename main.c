@@ -16,14 +16,13 @@
 
 int main( int argc, char **argv){
     int scelta=0;
+    uint8 nome_file[1024];
     list l=NULL;
-    lzw_compression();
-    //lzw_decompression();
     
-    //menu_start();
-    //menu( &scelta );
-    /*
-    while( 0 ){ // scelta != 6 ){
+    menu_start();
+    menu( &scelta );
+    
+    while( scelta != 6 ){
         switch ( scelta ) {
             case 1:
                 printf("Creazione dizonaro per file %s\n", argv[1]);
@@ -37,16 +36,31 @@ int main( int argc, char **argv){
                 break;
             case 3:
                 printf("Compressione lzw\n");
-                lzw_compression();
+                printf("Digita il nome del file da comprimere\n");
+                fflush(stdin);
+                scanf("%s", nome_file);
+                lzw_compression( nome_file );
+                printf("*********************** FINE *************************\n");
+                printf("******************************************************\n");
+                printf("\n\n\n\n");
                 menu( &scelta);
                 break;
             case 4:
-                
+                printf("Decompressione lzw\n");
+                printf("Digita il nome del file da decomprimere\n");
+                fflush(stdin);
+                scanf("%s", nome_file);
+                lzw_decompression( nome_file );
+                printf("*********************** FINE *************************\n");
+                printf("******************************************************\n");
+                printf("\n\n\n\n");
+                menu( &scelta);
+                break;
                 menu( &scelta);
                 break;
             case 5:
                 printf("DeCompressione lzw\n");
-                lzw_decompression();
+                lzw_decompression( nome_file );
                 menu( &scelta);
                 break;
             case 6:
@@ -57,6 +71,6 @@ int main( int argc, char **argv){
                 break;
         }
     }
-    */
+    
     return 0;    
 }
