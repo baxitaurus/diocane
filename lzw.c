@@ -41,7 +41,7 @@ diz_lzw initAscii(){
     int i;
     diz_long =0;
     reset_array( karray );
-    for( i=0x01; i<=0xFF; i++){ 
+    for( i=0x61; i<=0x63; i++){ 
         karray[0] = i;
         dizionario = cons_tail(dizionario, karray);
     }
@@ -49,15 +49,16 @@ diz_lzw initAscii(){
     return dizionario;
 }
 
-void lzw_compression( uint8 *nome_file ){
+void lzw_compression( char *nome_file ){
     uint16 strCorr[TABLE_SIZE];
     uint16 strPrs[TABLE_SIZE];
     uint16 lstChr;
     uint16 carattere_speciale = 0;
     uint8 carattere_letto=0;
-    uint16 write;
-    uint8 file_lzw[100]=""; 
-
+    uint16 write; 
+    uint16 diz_position;
+    uint32 dim_file_orig;    
+    char file_lzw[100]="";
     
     FILE *fp, *fo;
     diz_lzw dizionario = NULL;
@@ -69,6 +70,12 @@ void lzw_compression( uint8 *nome_file ){
         printf("ERRORE: apertura file: %s\n", nome_file);
         exit(1);
     }
+    
+    fseek(fp, 0, SEEK_END);
+    dim_file_orig = ftell(fp);
+    printf("Dimensione file originale %s: %d byte\n", nome_file, dim_file_orig);
+    fseek(fp, 0, SEEK_SET);
+      
     strcpy(file_lzw, nome_file);
     strcat(file_lzw, ".lzw");
     
@@ -76,36 +83,48 @@ void lzw_compression( uint8 *nome_file ){
         printf("ERRORE: apertura file: %s\n", file_lzw);
         exit(1);
     }
-    
+    printf("Creazione dizionario base...\n");
     dizionario = initUTF8();
     reset_array( strCorr );
-    
-    while((fread( &carattere_letto, sizeof( uint8 ), 1, fp)) > 0){                
-        //printf("%x\n", carattere_letto);
-        
+    printf("Inizio processo di compressione...\n");
+    printf("Percentuale: \n");
+    while((fread( &carattere_letto, sizeof( uint8 ), 1, fp)) > 0){         
+        printf("\b\b\b %ld", (ftell(fp)*100)/dim_file_orig);        
+        fflush( stdout );
         if( carattere_letto <= 0x7F ){
             strCorr[buffer_pointer] = carattere_letto;            
             carattere_letto = 0;   
         } else {
             carattere_speciale = carattere_letto;
             fread(&carattere_letto, sizeof( uint8 ), 1, fp);
-            //printf("%x\n", carattere_letto);
             carattere_speciale <<= 8;
             carattere_speciale += carattere_letto;            
             strCorr[buffer_pointer] = carattere_speciale;
             carattere_speciale = 0;      
         }
         
-        if (trova( dizionario, strCorr )){
-            buffer_pointer++;
+        if ( (diz_position = trova( dizionario, strCorr ))){
+            if ( buffer_pointer< TABLE_SIZE )
+                buffer_pointer++;
+            else {
+                lstChr = strCorr[buffer_pointer];
+                reset_array( strPrs );                
+                fwrite( &diz_position, sizeof( uint16 ), 1, fo);
+                printf("\n+\n");
+                reset_array( strCorr );
+                buffer_pointer = 0;
+                strCorr[buffer_pointer] = lstChr;
+                buffer_pointer++;
+            }
         } else {
             lstChr = strCorr[buffer_pointer];
             reset_array( strPrs );
             for( i = 0; i < buffer_pointer; i++ )
                 strPrs[i] = strCorr[i];  
             write = trova ( dizionario, strPrs);            
-            fwrite( &write, sizeof( uint16 ), 1, fo);            
+            fwrite( &write, sizeof( uint16 ), 1, fo);              
             cons_tail(dizionario, strCorr);
+                                          
             reset_array( strCorr );
             buffer_pointer = 0;
             strCorr[buffer_pointer] = lstChr;
@@ -114,37 +133,40 @@ void lzw_compression( uint8 *nome_file ){
     }  
     write = trova( dizionario, strCorr);
     fwrite( &write, 2, 1, fo);
-    printf("NUMERO DI DATI IN DIZIONARIO: %d ( %d + %d )\n", diz_long, diz_original, diz_long - diz_original );   
-    fseek(fp, 0, SEEK_SET);
-    fseek(fp, 0, SEEK_END);
-    printf("Dimensione file originale %s: %d byte\n", nome_file, ftell(fp));
+    printf("\nNUMERO DI DATI IN DIZIONARIO: %d ( %d + %d )\n", diz_long, diz_original, diz_long - diz_original );   
     fseek(fo, 0, SEEK_SET);
     fseek(fo, 0, SEEK_END);
-    printf("Dimensione file compresso %s: %d byte\n", file_lzw, ftell(fo));
+    printf("\nDimensione file compresso %s: %ld byte\n", file_lzw, ftell(fo));
+    printf("Rapporto compressione: %ld %% \n", (ftell(fo)*100)/ftell(fp));
     fclose( fp );
     fclose( fo );
+    
 }
 
 
-void lzw_decompression( uint8 *file_lzw ){
+void lzw_decompression( char *file_lzw ){
     FILE *fi, *fo;
     uint16 dec, olDec;
     uint16 strLst[TABLE_SIZE];
     uint16 strTmp[TABLE_SIZE];
     uint16 strConc[TABLE_SIZE];
     diz_lzw dizionario = NULL;
-    uint8 file_decompresso[100]=""; 
+    char file_decompresso[100]=""; 
+    uint32 dim_file_compresso;
     
-    
-    
+    printf("Apertura File %s ...\n", file_lzw);
     if((fi=fopen(file_lzw, "rb"))==NULL){
         printf("ERRORE: apertura file: %s\n", file_lzw);
         exit(1);
-    }
+    }    
+    fseek(fi, 0, SEEK_END);
+    dim_file_compresso = ftell(fi);
+    printf("Dimensione file compresso %s: %d byte\n", file_lzw, dim_file_compresso);
+    fseek(fi, 0, SEEK_SET);
     
-    strcpy(file_decompresso, file_lzw);
-    strcat(file_decompresso, ".txt");  
-    if((fo=fopen("Bibbia.dec.txt", "wb"))==NULL){
+    strcpy( file_decompresso, file_lzw);
+    strcat( file_decompresso, ".txt");  
+    if((fo=fopen( file_decompresso, "wb"))==NULL){
         printf("ERRORE: apertura file: %s\n", file_decompresso);
         exit(1);
     }
@@ -154,16 +176,19 @@ void lzw_decompression( uint8 *file_lzw ){
     reset_array( strTmp );
     reset_array( strConc );
     
+    printf("Inizio processo di compressione...\n");
+    printf("Percentuale: \n");
+    
     fread(&dec, sizeof( uint16 ), 1, fi);
     find_code( dizionario, dec, strLst );
-    stampa( strLst );
+    //stampa( strLst );
     write_file( strLst, fo );
-    olDec = dec;
-    
-    
-    while((fread(&dec, sizeof( uint16 ), 1, fi)) > 0){  
+    olDec = dec;    
+    while((fread(&dec, sizeof( uint16 ), 1, fi)) > 0){
+        printf("\b\b\b %ld", (ftell(fi)*100)/dim_file_compresso);        
+        fflush( stdout );  
         if( find_code( dizionario, dec, strTmp ) ){
-            stampa( strTmp );
+            //stampa( strTmp );
             write_file( strTmp, fo );
             concatena( strLst, strTmp, strConc );
             cons_tail(dizionario, strConc);
@@ -173,17 +198,15 @@ void lzw_decompression( uint8 *file_lzw ){
             reset_array( strConc );
         } else {
             concatena( strLst, strLst, strConc );
-            stampa( strConc );
+            //stampa( strConc );
             write_file( strConc, fo );
             cons_tail(dizionario, strConc);
         }
     }    
-    fseek(fi, 0, SEEK_SET);
-    fseek(fi, 0, SEEK_END);
-    printf("Dimensione file compresso %s: %d byte\n", file_lzw, ftell(fi));
+    
     fseek(fo, 0, SEEK_SET);
     fseek(fo, 0, SEEK_END);
-    printf("Dimensione file decompresso %s: %d byte\n", file_decompresso, ftell(fo));
+    printf("\nDimensione file decompresso %s: %ld byte\n", file_decompresso, ftell(fo));
     fclose( fi );
     fclose( fo );    
 }
@@ -245,7 +268,7 @@ diz_lzw cons_tail(diz_lzw l,uint16 *e){
     return l;
 }
 
-int trova ( diz_lzw l,uint16 *str){
+uint16 trova ( diz_lzw l,uint16 *str){
     int trovato = 0;
     while((l!=NULL) && !trovato){
         if( confronta( l->char_code, str)){        
@@ -290,3 +313,4 @@ void concatena(uint16 *a,uint16 *b,uint16 *risultato){
         }
     }
 }
+

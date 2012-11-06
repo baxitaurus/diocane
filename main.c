@@ -16,8 +16,10 @@
 
 int main( int argc, char **argv){
     int scelta=0;
-    uint8 nome_file[1024];
+    char nome_file[1024];
     list l=NULL;
+    
+    
     
     menu_start();
     menu( &scelta );
@@ -46,6 +48,10 @@ int main( int argc, char **argv){
                 menu( &scelta);
                 break;
             case 4:
+                
+                menu( &scelta);
+                break;
+            case 5:
                 printf("Decompressione lzw\n");
                 printf("Digita il nome del file da decomprimere\n");
                 fflush(stdin);
@@ -54,13 +60,6 @@ int main( int argc, char **argv){
                 printf("*********************** FINE *************************\n");
                 printf("******************************************************\n");
                 printf("\n\n\n\n");
-                menu( &scelta);
-                break;
-                menu( &scelta);
-                break;
-            case 5:
-                printf("DeCompressione lzw\n");
-                lzw_decompression( nome_file );
                 menu( &scelta);
                 break;
             case 6:
