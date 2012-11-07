@@ -5,6 +5,9 @@
 #ifndef _STDLIB_H
 #include <stdlib.h>
 #endif
+#ifndef	_MATH_H
+#include <math.h>
+#endif
 
 typedef struct {
     unsigned int carattere;
@@ -17,6 +20,8 @@ typedef struct item {
 } nodo;
 
 typedef nodo* list;
+
+
 
 list scroll_txt_file(char *file, list l);
 list cons( list l, unsigned int x, int *overflow);
@@ -31,3 +36,4 @@ list cons_el( info_carattere m,  list lista_ordinata);
 info_carattere cerca_maggiore(list l);
 list insOrd( list l, info_carattere e);
 int length_list(list l); // aggiunta da baxitaurus
+float calcolo_entropia(list l);

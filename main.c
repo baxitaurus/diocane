@@ -27,9 +27,11 @@ int main( int argc, char **argv){
     while( scelta != 6 ){
         switch ( scelta ) {
             case 1:
-                printf("Creazione dizonaro per file %s\n", argv[1]);
-                l = scroll_txt_file(argv[1], l);                
-                show_list( l );
+                printf("Creazione dizonaro \n");
+                printf("Digita il nome del file da comprimere\n");
+                fflush(stdin);
+                scanf("%s", nome_file);
+                l = scroll_txt_file(nome_file, l);                                
                 menu( &scelta);
                 break;
             case 2:

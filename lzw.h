@@ -1,4 +1,7 @@
 #define	LZW_H
+#ifndef READFILE_H
+#include "readfile.h"
+#endif
 #ifndef _STDIO_H
 #include <stdio.h>
 #endif
@@ -9,7 +12,9 @@
 #include <string.h>
 #endif
 
-#define TABLE_SIZE 15
+
+
+#define TABLE_SIZE 20
 
 #define ByteSwap16(n) \
     ( ((((unsigned int) n) << 8) & 0xFF00) | \
@@ -19,6 +24,8 @@
 typedef unsigned int uint32;
 typedef unsigned short int uint16;
 typedef unsigned char uint8;
+typedef signed int sint32;
+
 
 typedef struct item_diz {
     uint16 char_code[TABLE_SIZE];

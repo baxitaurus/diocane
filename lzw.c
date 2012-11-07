@@ -2,8 +2,8 @@
 #include "lzw.h"
 #endif
 
-uint16 diz_long;
-uint16 diz_original;
+static uint16 diz_long;
+static uint16 diz_original;
 diz_lzw initUTF8(){
     //creo lista con i valori base dell'alfabeto a-z A-Z 0-1 simboli e accenti vari
     int i;
@@ -63,8 +63,12 @@ void lzw_compression( char *nome_file ){
     FILE *fp, *fo;
     diz_lzw dizionario = NULL;
     int buffer_pointer = 0;
-    int i;
-        
+    int i, old_perc = 0, perc;
+    
+    list lista_calcolo_entropia = NULL;
+    float entropia;
+
+    
     printf("Apertura File %s ...\n", nome_file);
     if((fp=fopen( nome_file, "rb"))==NULL){
         printf("ERRORE: apertura file: %s\n", nome_file);
@@ -88,9 +92,13 @@ void lzw_compression( char *nome_file ){
     reset_array( strCorr );
     printf("Inizio processo di compressione...\n");
     printf("Percentuale: \n");
-    while((fread( &carattere_letto, sizeof( uint8 ), 1, fp)) > 0){         
-        printf("\b\b\b %ld", (ftell(fp)*100)/dim_file_orig);        
-        fflush( stdout );
+    while((fread( &carattere_letto, sizeof( uint8 ), 1, fp)) > 0){     
+        perc = (ftell(fp)*100)/dim_file_orig;
+        if(perc != old_perc){
+                printf("\b\b\b\b\b\b %d %% ", perc );        
+                fflush( stdout );
+                old_perc = perc;
+        }                
         if( carattere_letto <= 0x7F ){
             strCorr[buffer_pointer] = carattere_letto;            
             carattere_letto = 0;   
@@ -104,7 +112,7 @@ void lzw_compression( char *nome_file ){
         }
         
         if ( (diz_position = trova( dizionario, strCorr ))){
-            if ( buffer_pointer< TABLE_SIZE )
+            if ( buffer_pointer < TABLE_SIZE-1 )
                 buffer_pointer++;
             else {
                 lstChr = strCorr[buffer_pointer];
@@ -138,10 +146,17 @@ void lzw_compression( char *nome_file ){
     fseek(fo, 0, SEEK_END);
     printf("\nDimensione file compresso %s: %ld byte\n", file_lzw, ftell(fo));
     printf("Rapporto compressione: %ld %% \n", (ftell(fo)*100)/ftell(fp));
+    
     fclose( fp );
     fclose( fo );
     
+    //calcolo entropia
+    lista_calcolo_entropia = scroll_txt_file( nome_file, lista_calcolo_entropia);
+    entropia = - calcolo_entropia( lista_calcolo_entropia );
+    printf("\n Entropia: %f\n", entropia);
 }
+
+
 
 
 void lzw_decompression( char *file_lzw ){
@@ -153,6 +168,7 @@ void lzw_decompression( char *file_lzw ){
     diz_lzw dizionario = NULL;
     char file_decompresso[100]=""; 
     uint32 dim_file_compresso;
+    int old_perc = 0, perc;
     
     printf("Apertura File %s ...\n", file_lzw);
     if((fi=fopen(file_lzw, "rb"))==NULL){
@@ -184,9 +200,14 @@ void lzw_decompression( char *file_lzw ){
     //stampa( strLst );
     write_file( strLst, fo );
     olDec = dec;    
-    while((fread(&dec, sizeof( uint16 ), 1, fi)) > 0){
-        printf("\b\b\b %ld", (ftell(fi)*100)/dim_file_compresso);        
-        fflush( stdout );  
+    while((fread(&dec, sizeof( uint16 ), 1, fi)) > 0){        
+        perc = (ftell(fi)*100)/dim_file_compresso;
+        if(perc != old_perc){
+                printf("\b\b\b\b\b\b %d %% ", perc );        
+                fflush( stdout );
+                old_perc = perc;
+        } 
+         
         if( find_code( dizionario, dec, strTmp ) ){
             //stampa( strTmp );
             write_file( strTmp, fo );
