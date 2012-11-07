@@ -21,9 +21,13 @@ typedef struct item {
 
 typedef nodo* list;
 
+<<<<<<< Updated upstream
 
 
 list scroll_txt_file(char *file, list l);
+=======
+list scroll_txt_file(char file[], list l);
+>>>>>>> Stashed changes
 list cons( list l, unsigned int x, int *overflow);
 int member( list l, unsigned int x);
 int add_presenza( list l, unsigned int x, int **overflow);

@@ -9,10 +9,10 @@ void menu_start(){
 void menu(int *scelta){
     printf("Scegli una opzione per:\n");
     printf("1 - Crea file statistiche presenze caratteri\n");
-    printf("2 - Comprimi usando algoritmo Huffman statico\n");
+    printf("2 - Codifica usando algoritmo Huffman statico\n");
     printf("3 - Comprimi usando algoritmo LZW\n");
-    printf("4 - Decomprimi usando algoritmo Huffman statico\n");
-    printf("5 - Decomprimi usando algoritmo LZW\n");   
+    printf("4 - Decomprimi usando algoritmo LZW\n");
+    printf("5 - Decodifica usando algoritmo Huffman Statico\n");   
     printf("6 - Uscita dal programma\n");
     scanf("%d", scelta);
 } 

@@ -1,18 +1,26 @@
 #include "readfile.h"
 
+<<<<<<< Updated upstream
 static unsigned int totale_caratteri_letti = 0;
 
 
 list scroll_txt_file(char *file, list l){
+=======
+list scroll_txt_file(char file[], list l){
+>>>>>>> Stashed changes
     FILE *fp;
     unsigned int x=0;
     unsigned char y=0;
     list lista_ordinata=NULL;
     int overflow=0;
+<<<<<<< Updated upstream
     unsigned int dim_file;
     int old_perc = 0, perc;
     
     if((fp=fopen(file, "rb"))==NULL){
+=======
+    if((fp=fopen(file, "rt"))==NULL){
+>>>>>>> Stashed changes
         printf("ERRORE: apertura file: %s\n", file);
         exit(1);
     }
